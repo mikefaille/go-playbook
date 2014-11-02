@@ -1,0 +1,38 @@
+- name: download go at /tmp/go{{ go_version }}.src.tar.gz
+  get_url: url=https://storage.googleapis.com/golang/go{{ go_version }}.src.tar.gz dest=/tmp/go{{ go_version }}.src.tar.gz
+
+- name : check if /usr/local/go{{ go_version }} exist
+  file : path=/usr/local/go1.3.3 state=directory
+
+- name : extract go at /usr/local/go{{ go_version }}
+  unarchive: src=/tmp/go{{ go_version }}.src.tar.gz dest=/usr/local/go{{ go_version }}
+
+- name : check if current go instalation at /usr/local/go exist
+  stat: path=/usr/local/go
+  register: go_current_path
+
+
+- name: /usr/local/go is not a symlink. So, just backup it and symlink /usr/local/go{{ go_version }} to /usr/local/go
+  command : mv /usr/local/go /usr/local/go.back
+  when: go_current_path.stat.exists and go_current_path.stat.islnk
+
+
+- name : if /usr/local/go is a symlink unlink it to generate a new. Else, just backup /usr/local/go.
+  file: path=/usr/local/go state=absent
+  when : go_current_path.stat.exists  and not go_current_path.stat.islnk
+
+- file : src=/usr/local/go{{ go_version }}/go dest=/usr/local/go state=link
+
+- name : compile go !
+  command : chdir=/usr/local/go/src  ./make.bash -j{{ ansible_processor_cores }} --no-rebuild
+
+- name : setup go path. Don't forget to create this folder -  ~/go
+  template: src=go.sh dest=/etc/profile.d/go.sh
+
+- name : go suppose to work. 
+  command: /usr/local/go/bin/go version
+  register: go_version
+
+- name : If you see the version, it work
+  debug: msg="{{ go_version.stdout_lines }}"
+
