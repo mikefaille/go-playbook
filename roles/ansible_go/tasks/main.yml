@@ -2,7 +2,7 @@
   get_url: url=https://storage.googleapis.com/golang/go{{ go_version }}.src.tar.gz dest=/tmp/go{{ go_version }}.src.tar.gz
 
 - name : check if /usr/local/go{{ go_version }} exist
-  file : path=/usr/local/go1.3.3 state=directory
+  file : path=/usr/local/go{{ go_version }} state=directory
 
 - name : extract go at /usr/local/go{{ go_version }}
   unarchive: src=/tmp/go{{ go_version }}.src.tar.gz dest=/usr/local/go{{ go_version }}
@@ -31,8 +31,8 @@
 
 - name : go suppose to work. 
   command: /usr/local/go/bin/go version
-  register: go_version
+  register: go_version_stdout
 
 - name : If you see the version, it work
-  debug: msg="{{ go_version.stdout_lines }}"
+  debug: msg="{{ go_version_stdout.stdout_lines }}"
 
