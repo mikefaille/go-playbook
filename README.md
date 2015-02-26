@@ -14,11 +14,11 @@ To install on localhost, just run
 $ sudo ansible-playbook site.yml
 ```
 
-(as I write this file) The current go stable version is 1.4.1
+(as I write this file) The current go stable version is 1.4.2
 
 But, if you want use newer stable releases (in the future), open http://golang.org/dl/ check version number like x.y.z in go1.4.src.tar.gz for example and replace it at this file group_vars/all changing :
 ```
-go_version: 1.4.1
+go_version: 1.4.2
 ```
 to
 ```
